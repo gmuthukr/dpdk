@@ -976,6 +976,18 @@ rte_vhost_driver_register(const char *path, uint64_t flags)
 			if (vhost_user_reconnect_init() != 0)
 				goto out_mutex;
 		}
+		if (vsocket->linearbuf && vsocket->extbuf) {
+			VHOST_LOG_CONFIG(INFO, "Requesting guest offloads\n");
+			struct virtio_hw *hw = dev->data->dev_private;
+			struct virtio_net_offload_ctrl ctrl;
+
+			ctrl.hdr.class = VIRTIO_NET_CTRL_GUEST_OFFLOADS;
+			ctrl.hdr.cmd = VIRTIO_NET_CTRL_GUEST_OFFLOADS_SET;
+
+			virtio_send_command(hw->cvq, &ctrl, NULL, 0);
+		}
+	}
+
 	} else {
 		vsocket->is_server = true;
 	}
