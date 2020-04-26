@@ -400,7 +400,7 @@ typedef uint8_t virtio_net_ctrl_ack;
 #define VIRTIO_NET_ERR    1
 #define VIRTIO_MAX_CTRL_DATA 2048
 
-struct virtio_net_offload_ctrl {
+struct virtio_net_vhost_ctrl {
         struct virtio_net_ctrl_hdr hdr;
         virtio_net_ctrl_ack status;
         uint8_t data[VIRTIO_MAX_CTRL_DATA];
@@ -408,6 +408,7 @@ struct virtio_net_offload_ctrl {
 
 #define VIRTIO_NET_CTRL_GUEST_OFFLOADS     5
 #define VIRTIO_NET_CTRL_GUEST_OFFLOADS_SET 0
+
 static __rte_always_inline bool
 vq_is_packed(struct virtio_net *dev)
 {
