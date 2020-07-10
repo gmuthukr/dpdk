@@ -149,7 +149,7 @@ static uint16_t nb_lcore_params = sizeof(lcore_params_array_default) /
 
 static struct rte_eth_conf port_conf = {
 	.rxmode = {
-		.mq_mode = ETH_MQ_RX_RSS,
+		.mq_mode = ETH_MQ_RX_NONE,
 		.max_rx_pkt_len = ETHER_MAX_LEN,
 		.split_hdr_size = 0,
 		.header_split   = 0, /**< Header Split disabled */
@@ -906,7 +906,7 @@ main(int argc, char **argv)
 		fflush(stdout);
 
 		nb_rx_queue = get_port_n_rx_queues(portid);
-		n_tx_queue = nb_lcores;
+		n_tx_queue = 1;
 		if (n_tx_queue > MAX_TX_QUEUE_PER_PORT)
 			n_tx_queue = MAX_TX_QUEUE_PER_PORT;
 		printf("Creating queues: nb_rxq=%d nb_txq=%u... ",
@@ -968,6 +968,9 @@ main(int argc, char **argv)
 
 			qconf->tx_port_id[qconf->n_tx_port] = portid;
 			qconf->n_tx_port++;
+
+			if (!n_tx_queue < n_tx_queue)
+				break;
 		}
 		printf("\n");
 	}
