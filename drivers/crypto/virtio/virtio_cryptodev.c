@@ -1501,33 +1501,83 @@ virtio_crypto_asym_rsa_xform_to_der(
 {
 	uint8_t data[VIRTIO_CRYPTO_MAX_CTRL_DATA];
 	uint8_t ver[3] = {0x02, 0x01, 0x00};
-	size_t tlen, len;
+	size_t tlen, len, avail;
 	uint8_t *tlv;
 
 	if (xform->xform_type != RTE_CRYPTO_ASYM_XFORM_RSA)
 		return -EINVAL;
 
 	tlv = data;
+	avail = RTE_DIM(data);
+
 	rte_memcpy(tlv, ver, RTE_DIM(ver));
 	tlen = RTE_DIM(ver);
+	avail -= tlen;
+
+	/* additional 4 bytes at max for TLV encoding */
+	if ((xform->rsa.n.length + 4) > avail) {
+		VIRTIO_CRYPTO_SESSION_LOG_ERR("RSA n length is too long");
+		return -EINVAL;
+	}
 	len = tlv_encode(tlv + tlen, 0x02, xform->rsa.n.data, xform->rsa.n.length);
 	tlen += len;
+	avail -= len;
+
+	if ((xform->rsa.e.length + 4) > avail) {
+		VIRTIO_CRYPTO_SESSION_LOG_ERR("RSA e length is too long");
+		return -EINVAL;
+	}
 	len = tlv_encode(tlv + tlen, 0x02, xform->rsa.e.data, xform->rsa.e.length);
 	tlen += len;
+	avail -= len;
+
+	if ((xform->rsa.d.length + 4) > avail) {
+		VIRTIO_CRYPTO_SESSION_LOG_ERR("RSA d length is too long");
+		return -EINVAL;
+	}
 	len = tlv_encode(tlv + tlen, 0x02, xform->rsa.d.data, xform->rsa.d.length);
 	tlen += len;
+	avail -= len;
+
+	if ((xform->rsa.qt.p.length + 4) > avail) {
+		VIRTIO_CRYPTO_SESSION_LOG_ERR("RSA qt.p length is too long");
+		return -EINVAL;
+	}
 	len = tlv_encode(tlv + tlen, 0x02, xform->rsa.qt.p.data, xform->rsa.qt.p.length);
 	tlen += len;
+	avail -= len;
+
+	if ((xform->rsa.qt.q.length + 4) > avail) {
+		VIRTIO_CRYPTO_SESSION_LOG_ERR("RSA qt.q length is too long");
+		return -EINVAL;
+	}
 	len = tlv_encode(tlv + tlen, 0x02, xform->rsa.qt.q.data, xform->rsa.qt.q.length);
 	tlen += len;
+	avail -= len;
+
+	if ((xform->rsa.qt.dP.length + 4) > avail) {
+		VIRTIO_CRYPTO_SESSION_LOG_ERR("RSA qt.dP length is too long");
+		return -EINVAL;
+	}
 	len = tlv_encode(tlv + tlen, 0x02, xform->rsa.qt.dP.data, xform->rsa.qt.dP.length);
 	tlen += len;
+	avail -= len;
+
+	if ((xform->rsa.qt.dQ.length + 4) > avail) {
+		VIRTIO_CRYPTO_SESSION_LOG_ERR("RSA qt.dQ length is too long");
+		return -EINVAL;
+	}
 	len = tlv_encode(tlv + tlen, 0x02, xform->rsa.qt.dQ.data, xform->rsa.qt.dQ.length);
 	tlen += len;
+	avail -= len;
+
+	if ((xform->rsa.qt.qInv.length + 4) > avail) {
+		VIRTIO_CRYPTO_SESSION_LOG_ERR("RSA qt.qInv length is too long");
+		return -EINVAL;
+	}
 	len = tlv_encode(tlv + tlen, 0x02, xform->rsa.qt.qInv.data, xform->rsa.qt.qInv.length);
 	tlen += len;
 
-	RTE_ASSERT(tlen < VIRTIO_CRYPTO_MAX_CTRL_DATA);
 	len = tlv_encode(der, 0x30, data, tlen);
 	return len;
 }
