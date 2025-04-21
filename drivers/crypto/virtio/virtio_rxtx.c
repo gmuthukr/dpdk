@@ -1003,7 +1003,7 @@ virtio_crypto_dataq_start(struct rte_cryptodev *dev)
 }
 
 /* vring size of data queue is 1024 */
-#define VIRTIO_MBUF_BURST_SZ 1024
+#define VIRTIO_MBUF_BURST_SZ UINT16_C(1024)
 
 uint16_t
 virtio_crypto_pkt_rx_burst(void *tx_queue, struct rte_crypto_op **rx_pkts,
